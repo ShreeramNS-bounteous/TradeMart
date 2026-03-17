@@ -1,6 +1,8 @@
 package com.stockexchange.backend.service;
 
+import com.stockexchange.backend.entity.PriceHistory;
 import com.stockexchange.backend.entity.Stock;
+import com.stockexchange.backend.repository.PriceHistoryRepository;
 import com.stockexchange.backend.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class StockPriceSimulator {
     private final MarginService        marginService;
     private final MarketHoursService   marketHoursService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final PriceHistoryRepository priceHistoryRepository;
     // SimpMessagingTemplate sends messages to WebSocket subscribers.
     // Frontend subscribes to "/topic/prices" to receive live updates.
 
@@ -59,6 +62,14 @@ public class StockPriceSimulator {
             stock.setLastUpdatedAt(LocalDateTime.now());
 
             stockRepository.save(stock);
+            priceHistoryRepository.save(
+                    PriceHistory.builder()
+                            .ticker(stock.getTicker())
+                            .price(newPrice)
+                            .time(java.time.Instant.now().getEpochSecond())
+                            .build()
+            );
+
             // After price update, check if any limit orders can now execute.
             orderService.checkAndExecuteLimitOrders(
                     stock.getId(), newPrice);
