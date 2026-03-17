@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: backend
+
+  profiles:
+    active: local
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+
+market:
+  open:
+    time: "00:00"
+  close:
+    time: "23:59"
+  timezone: "Asia/Kolkata"
+
+
+margin:
+  default:
+    multiplier: 5
+  call:
+    threshold: 0.8
+
+
+simulator:
+  update:
+    interval: 5000
+  max:
+    change:
+      percent: 2
